@@ -8,6 +8,7 @@ class ChainsService:
 	def run_chain(chain_data):
 		template = """
   			Question: {question}. 
+			If you don't know, search the internet or ask a human
      		"""
 		prompt = PromptTemplate(
 			template=template, input_variables=["question"])
