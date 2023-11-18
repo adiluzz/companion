@@ -1,7 +1,6 @@
 import datetime
 from mongoengine import *
 
-connect('comapnion')
 
 class ChainError(Document):
     error_time = DateTimeField()
