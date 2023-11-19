@@ -1,5 +1,5 @@
 from threading import Thread
-from langchain import PromptTemplate
+from langchain.prompts import PromptTemplate
 import os
 from companion.modules.models.models_service import run_chain as run_chain_service
 from companion.modules.chains.chains_model import Chain

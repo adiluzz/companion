@@ -1,8 +1,10 @@
 import os
-from langchain import GoogleSearchAPIWrapper, LLMChain
+from langchain.chains import LLMChain
+from langchain.utilities import GoogleSearchAPIWrapper
 from langchain.llms import LlamaCpp
 from langchain.tools import Tool, tool, ShellTool
-from langchain.agents import load_tools, initialize_agent, create_csv_agent
+from langchain.agents import load_tools, initialize_agent
+from langchain_experimental.agents.agent_toolkits.csv.base import create_csv_agent
 from langchain.agents.agent_types import AgentType
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.callbacks.manager import CallbackManager
@@ -82,7 +84,7 @@ def get_tools(llm):
 
 
 	tools = load_tools([
-		'python_repl',
+	#	'python_repl',
 		'requests_all',
 		'terminal',
 		# 'wikipedia',
