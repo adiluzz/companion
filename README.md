@@ -12,13 +12,12 @@ GOOGLE_CREDENTIALS_ID=
 # LLM path
 MODEL_PATH=
 
-# MongoDB credentials
+# MongoDB credentials, leave out if you want to connect to localhost
 BASTION_HOST=
 BASTION_USER=
-PRIVATE_KEY_PATH=/home/adi_iluz/.ssh/id_rsa
+PRIVATE_KEY_PATH=
 MONGO_HOST=
 LOCAL_MONGO_PORT=
-DB_NAME=
 ```
 
 ## To run server, run:
