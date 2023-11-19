@@ -1,15 +1,16 @@
+import os
 import mongoengine
 from mongoengine import *
 from sshtunnel import SSHTunnelForwarder
 
-bastion_host = "44.204.129.77"
-bastion_user = "ubuntu"
-private_key_path = "/home/adi_iluz/.ssh/id_rsa"
-mongo_host = "10.0.2.137"
-local_port = 27017
-database_name = 'companion'
 
 def connect_to_db():
+    bastion_host = os.environ['BASTION_HOST']
+    bastion_user = os.environ['BASTION_USER']
+    private_key_path = os.environ['PRIVATE_KEY_PATH']
+    mongo_host = os.environ['MONGO_HOST']
+    local_port = int(os.environ['LOCAL_MONGO_PORT'])
+    database_name = os.environ['DB_NAME']
     tunnel =  SSHTunnelForwarder(
         bastion_host,
         ssh_username=bastion_user,
