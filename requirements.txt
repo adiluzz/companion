@@ -94,7 +94,7 @@ python-debian==0.1.43+ubuntu1.1
 python-dotenv==1.0.0
 pytz==2022.1
 pyxdg==0.27
-PyYAML==5.4.1
+PyYAML==6.0.1
 reportlab==3.6.8
 requests==2.25.1
 rsa==4.9
