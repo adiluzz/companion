@@ -65,30 +65,23 @@ def get_llm(chain_id):
 
 def get_tools(llm):
 	search = GoogleSearchAPIWrapper()
-	def top5_results(query):
-		return search.results(query, 5)
 
 	def top10_results(query):
 		return search.results(query, 10)
 
-
-
 	tool = Tool(
 		name="Google Search Snippets",
-		# description="Search Google for recent results.",
         description="useful for when you need to answer questions about current events. You should ask targeted questions",
-
 		func=top10_results,
 	)
 	shell_tool = ShellTool()
-
 
 	tools = load_tools([
 	#	'python_repl',
 		'requests_all',
 		'terminal',
-		# 'wikipedia',
-		# 'human'
+		'wikipedia',
+		'human'
 	], llm=llm)
 	tools.append(tool)
 	tools.append(shell_tool)
@@ -104,12 +97,12 @@ def get_agent(tools, llm, export_to_csv):
 		)
 	else:
 		return initialize_agent(
-			tools, llm, agent=AgentType.SELF_ASK_WITH_SEARCH, verbose=True)
+			tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
 
 def run_chain(questions, prompt, chain_id):
 	llm = get_llm(chain_id=chain_id)
 	tools = get_tools(llm)
-	agent = get_agent(tools=tools, llm=llm, export_to_csv=True)
+	agent = get_agent(tools=tools, llm=llm, export_to_csv=False)
 	llm_chain = LLMChain(llm=llm, prompt=prompt)
 	llm_chain.apply(questions)
 	first_output = agent.run(llm_chain)
