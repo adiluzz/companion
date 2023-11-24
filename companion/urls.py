@@ -16,13 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
+from companion.modules.models.connect_to_db import connect_to_db
 from . import views
 from . import chains
 from dotenv import load_dotenv
 
 
 load_dotenv()
-
+connect_to_db()
 
 urlpatterns = [
     path("", views.index, name="index"),
