@@ -1,8 +1,7 @@
 import os
 from langchain.chains import LLMChain
 from langchain.utilities import GoogleSearchAPIWrapper
-# from langchain.llms import LlamaCpp
-from llama_cpp import llama_cpp
+from langchain.llms import LlamaCpp
 from langchain.tools import Tool, tool, ShellTool
 from langchain.agents import load_tools, initialize_agent
 from langchain_experimental.agents.agent_toolkits.csv.base import create_csv_agent
@@ -51,7 +50,7 @@ def get_callback_manager(chain_id):
 def get_llm(chain_id):
 	callback_manager = get_callback_manager(chain_id)
 	path = os.environ['MODEL_PATH']
-	llm =llama_cpp(
+	llm =LlamaCpp(
 		model_path=path,
 		# n_gpu_layers=n_gpu_layers,
 		# n_batch=n_batch,
