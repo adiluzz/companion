@@ -32,6 +32,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = [
     'https://api.consisto.io',
+    'api.consisto.io',
     '127.0.0.1'
  ]
 
