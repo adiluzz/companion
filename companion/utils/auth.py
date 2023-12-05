@@ -217,7 +217,7 @@ class CognitAuthMiddleware(object):
             pool_id=COGNITO_USER_POOL,
             client_id=COGNITO_AUDIENCE,
         )
-        access_token = request.headers["Authorization"]
+        access_token = request.headers.get('Authorization')
         token_verified = auth.verify_token(access_token)
         if token_verified == False:
             return self.process_exception(request=request, exception='Not Authorized')
