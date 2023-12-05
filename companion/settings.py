@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import json
+from urllib import request
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,11 +28,12 @@ SECRET_KEY = 'django-insecure-r$!qp+0)gh%9@uw_+*%jhhd@(45o(8-_v5vx+o^!szf3ki2i1x
 DEBUG = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = [
-    'api.consisto.io',
-    '127.0.0.1:8000'
-]
+    '*.consisto.io',
+    '127.0.0.1'
+ ]
 
 
 # Application definition
@@ -43,16 +46,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'companion.utils.auth.CognitAuthMiddleware'
 ]
 
 ROOT_URLCONF = 'companion.urls'

@@ -1,6 +1,5 @@
 import os
 import mongoengine
-from mongoengine import *
 from sshtunnel import SSHTunnelForwarder
 
 
