@@ -63,7 +63,8 @@ class CognitoAuthenticator:
         Returns:
             True if valid, False otherwise
         """
-
+        if token.startswith("Bearer "):
+            token = token.removeprefix("Bearer ")
         try:
             self._is_jwt(token)
             self._get_verified_header(token)
@@ -218,6 +219,7 @@ class CognitAuthMiddleware(object):
             client_id=COGNITO_AUDIENCE,
         )
         access_token = request.headers.get('Authorization')
+        print(access_token)
         token_verified = auth.verify_token(access_token)
         if token_verified == False:
             return self.process_exception(request=request, exception='Not Authorized')
