@@ -57,7 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'companion.utils.auth.CognitAuthMiddleware'
+    #'companion.utils.auth.CognitAuthMiddleware'
 ]
 
 ROOT_URLCONF = 'companion.urls'
