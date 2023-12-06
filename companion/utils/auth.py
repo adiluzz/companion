@@ -63,7 +63,8 @@ class CognitoAuthenticator:
         Returns:
             True if valid, False otherwise
         """
-
+        if token.startswith("Bearer "):
+            token = token.removeprefix("Bearer ")
         try:
             self._is_jwt(token)
             self._get_verified_header(token)
