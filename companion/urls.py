@@ -20,6 +20,7 @@ from django.urls import path, include
 from companion.modules.models.connect_to_db import connect_to_db
 from . import views
 from . import chains
+from companion.modules.learn import learn
 from dotenv import load_dotenv
 
 
@@ -29,5 +30,6 @@ connect_to_db()
 urlpatterns = [
     path("", views.index, name="index"),
     path("chains", chains.index, name="chains"),
+    path("learn", learn.index, name="learn"),
     path('admin/', admin.site.urls),
 ]
