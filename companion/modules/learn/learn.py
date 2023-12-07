@@ -15,4 +15,4 @@ def index(request):
 		response_data['chain_id'] = chain_id
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	
-	return HttpResponse("Hello, world. You're at the chains index.")
+	return HttpResponse("Hello, world. You're at the learn index.")
