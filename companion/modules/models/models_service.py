@@ -88,7 +88,7 @@ def get_tools(llm):
 	return tools
 
 def get_agent(tools, llm, export_to_csv):
-	if export_to_csv == False:
+	if export_to_csv == True:
 		return create_csv_agent(
 			llm,
 			path='./temp/export.csv',
