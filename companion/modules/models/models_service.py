@@ -88,16 +88,16 @@ def get_tools(llm):
 	return tools
 
 def get_agent(tools, llm, export_to_csv):
-	if export_to_csv == True:
-		return create_csv_agent(
-			llm,
-			path='./temp/export.csv',
-			verbose=True,
-			# agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-		)
-	else:
-		return initialize_agent(
-			tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+	# if export_to_csv == True:
+	# 	return create_csv_agent(
+	# 		llm,
+	# 		path='./temp/export.csv',
+	# 		verbose=True,
+	# 		# agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+	# 	)
+	# else:
+	return initialize_agent(
+		tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
 
 def run_chain(questions, prompt, chain_id):
 	llm = get_llm(chain_id=chain_id)
