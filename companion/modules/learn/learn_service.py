@@ -4,7 +4,8 @@
 from langchain.embeddings import LlamaCppEmbeddings
 from langchain.prompts import ChatPromptTemplate
 from langchain.vectorstores import DocArrayInMemorySearch
-from langchain_core.output_parsers import StrOutputParser
+# from langchain_core.output_parsers import StrOutputParser
+from langchain.output_parsers import StructuredOutputParser
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough, RunnableSerializable
 # for llm
 import os
@@ -46,11 +47,9 @@ class LearnService:
     def run_simple_chain():
         prompt = ChatPromptTemplate.from_template("tell me a short joke about {topic}")
         model = get_llm()
-        output_parser = StrOutputParser()
         # build and run chain
-        chain = prompt | model | output_parser
-        chain.invoke({"topic": "ice cream"})
-        
+        chain = prompt | model
+        chain.invoke({"topic":"pasta"})        
 
 def get_llm():
     path = os.environ['MODEL_PATH']
