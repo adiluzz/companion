@@ -39,7 +39,7 @@ class LearnService:
         model = get_llm()
 
         # build and run chain
-        chain = prompt | model | StrOutputParser()
+        chain = {"context":retriever , "question": RunnablePassthrough()} | prompt | model 
 
         # runnable = RunnableSerializable({"question":"where did harrison work?"})
         chain.invoke({"question":"where did harrison work?"})
