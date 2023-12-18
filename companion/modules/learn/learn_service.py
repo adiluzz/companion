@@ -33,23 +33,35 @@ class LearnService:
 
         Question: {question}
         """
-        simple_template = "Answer this question: {question}"
-        prompt = ChatPromptTemplate.from_template(simple_template)
+        prompt = ChatPromptTemplate.from_template(template)
         
         model = get_llm()
 
         # build and run chain
-        chain = {"context":retriever , "question": RunnablePassthrough()} | prompt | model 
+        chain =  {"context":retriever, "question":RunnablePassthrough} | prompt | model
 
-        # runnable = RunnableSerializable({"question":"where did harrison work?"})
         chain.invoke({"question":"where did harrison work?"})
 
     def run_simple_chain():
         prompt = ChatPromptTemplate.from_template("tell me a short joke about {topic}")
         model = get_llm()
         # build and run chain
-        chain = prompt | model
-        chain.invoke({"topic":"pasta"})        
+        chain = prompt | model 
+        print(chain)    ## prints the chain pipeline
+        chain.invoke({"topic":"ice cream"})
+
+    def run_parallel_chain():
+        prompt = ChatPromptTemplate.from_template("given this context: {context}, answer this question: {question}")
+        model = get_llm()
+        # build and run chain
+        chain = (
+            {"context": RunnablePassthrough, "question":RunnablePassthrough}
+            | prompt
+            | model 
+            )
+        print(chain)    ## prints the chain pipeline
+        chain.invoke({"context":"harry is a lawyer who lives in Bronks", "question":"where does harry live?"})
+
 
 def get_llm():
     path = os.environ['MODEL_PATH']
