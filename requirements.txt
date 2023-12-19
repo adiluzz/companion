@@ -1,7 +1,7 @@
 Django==4.2.6
 mongoengine==0.27.0
 sshtunnel==0.4.0
-langchain==0.0.327
+langchain==0.0.351
 langchain-experimental==0.0.40
 python-dotenv==1.0.0
 llama-cpp-python==0.2.19
@@ -15,3 +15,5 @@ django-cors-headers==4.3.1
 huggingface_hub==0.17.3
 datasets==2.14.7
 langchain_core==0.1.1
+docarray==0.39.1
+pydantic==1.10.9
