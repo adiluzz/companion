@@ -12,6 +12,7 @@ import os
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms import LlamaCpp
+from langchain_core.output_parsers import StrOutputParser
 
 
 # Callbacks support token-wise streaming
@@ -36,11 +37,10 @@ class LearnService:
         prompt = ChatPromptTemplate.from_template(template)
         
         model = get_llm()
+        output_parser = StrOutputParser()
+        chain = {"context": retriever, "question": RunnablePassthrough()} | prompt | model | output_parser
 
-        # build and run chain
-        chain =  {"context":retriever, "question":RunnablePassthrough} | prompt | model
-
-        chain.invoke({"question":"where did harrison work?"})
+        chain.invoke("where did harrison work?")
 
     def run_simple_chain():
         prompt = ChatPromptTemplate.from_template("tell me a short joke about {topic}")

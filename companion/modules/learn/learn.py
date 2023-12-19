@@ -8,11 +8,7 @@ from companion.modules.learn.learn_service import LearnService
 
 def index(request):
 	if request.method == 'POST':
-		body = json.loads(request.body)
-		print(body)
-		chain_id = LearnService.run_parallel_chain()
-		response_data = {}
-		response_data['chain_id'] = chain_id
-		return HttpResponse(json.dumps(response_data), content_type="application/json")
+		LearnService.learn_from_file()
+		return HttpResponse('Success', content_type="application/json")
 	
 	return HttpResponse("Hello, world. You're at the learn index.")
