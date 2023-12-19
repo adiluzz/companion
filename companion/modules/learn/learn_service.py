@@ -13,19 +13,35 @@ from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms import LlamaCpp
 from langchain_core.output_parsers import StrOutputParser
+from langchain.document_loaders import WebBaseLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import Chroma
+import bs4
 
 
 # Callbacks support token-wise streaming
 callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+n_ctx = 4096 * 10
 
 class LearnService:
     def learn_from_file():
         # Embed text
-        vectorstore = DocArrayInMemorySearch.from_texts(
-            ["harrison worked at kensho and likes ice cream", "bears like to eat honey"],
-            embedding=LlamaCppEmbeddings(model_path=os.environ['MODEL_PATH']),
+        loader = WebBaseLoader(
+            web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",),
+            bs_kwargs=dict(
+                parse_only=bs4.SoupStrainer(
+                    class_=("post-content", "post-title", "post-header")
+                )
+            ),
         )
-        # Store in database
+        docs = loader.load()
+
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        splits = text_splitter.split_documents(docs)
+        vectorstore = Chroma.from_documents(documents=splits, embedding=LlamaCppEmbeddings(
+            model_path=os.environ['MODEL_PATH'],
+            n_ctx=n_ctx
+        ))
         retriever = vectorstore.as_retriever()
         
         # Prepare template and llm
@@ -39,7 +55,7 @@ class LearnService:
         model = get_llm()
         output_parser = StrOutputParser()
         chain = {"context": retriever, "question": RunnablePassthrough()} | prompt | model | output_parser
-
+        print(chain)
         chain.invoke("where did harrison work?")
 
     def run_simple_chain():
@@ -65,7 +81,6 @@ class LearnService:
 
 def get_llm():
     path = os.environ['MODEL_PATH']
-    n_ctx = 4096
     tokens = 10000000
 
     llm = LlamaCpp(

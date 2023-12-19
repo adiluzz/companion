@@ -17,3 +17,4 @@ datasets==2.14.7
 langchain_core==0.1.1
 docarray==0.39.1
 pydantic==1.10.9
+chromadb==0.4.20
