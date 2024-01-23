@@ -18,7 +18,6 @@ langchain_core==0.1.1
 docarray==0.39.1
 pydantic==1.10.9
 chromadb==0.4.20
-chainlit==0.7.700
 sentence-transformers==2.2.2
 faiss-gpu==1.7.2
 pypdf==3.17.3
