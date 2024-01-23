@@ -1,6 +1,3 @@
-# Requires:
-# pip install docarray tiktoken
-
 import os
 import multiprocessing
 from langchain.llms import LlamaCpp
@@ -34,13 +31,12 @@ def custom_prompt():
     custom_prompt_template = """Use the following pieces of information to answer the users question.
     If you dont know the answer, just say that you dont know, dont try to make up an answer.
 
-    Context: {context}
     Question: {question}
 
     Only return the helpful answer below and nothing else.
     Helpful and Caring answer:"""
     prompt = PromptTemplate(template=custom_prompt_template,
-                            input_variables=['context', 'question'])
+                            input_variables=['question'])
     return prompt
 
 
@@ -104,8 +100,8 @@ class LearnService:
         question = "what did Adi Iluz do in 2020?"
         prompt = ChatPromptTemplate.from_template(
             question)
-        chain = {"context": qa_result, "question": prompt
-                 } | prompt | llm
+        chain = {"question": prompt
+                 } | prompt | llm | qa_result
         response = chain.invoke()
         return response
 
