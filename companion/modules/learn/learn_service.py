@@ -31,12 +31,13 @@ def custom_prompt():
     custom_prompt_template = """Use the following pieces of information to answer the users question.
     If you dont know the answer, just say that you dont know, dont try to make up an answer.
 
+    Context: {context}
     Question: {question}
 
     Only return the helpful answer below and nothing else.
     Helpful and Caring answer:"""
     prompt = PromptTemplate(template=custom_prompt_template,
-                            input_variables=['question'])
+                            input_variables=['context', 'question'])
     return prompt
 
 
@@ -92,6 +93,17 @@ def qa_bot(llm, qa_prompt):
 
 
 class LearnService:
+    def query_vectorstore(question):
+        create_vector_db()
+        qa_prompt = custom_prompt()
+        llm = get_llm()
+        qa_result = qa_bot(llm=llm, qa_prompt=qa_prompt)
+        prompt = ChatPromptTemplate.from_template(
+            question)
+        chain = qa_result| prompt | llm
+        response = chain.invoke(question)
+        return response
+    
     def run_qa_chain():
         create_vector_db()
         qa_prompt = custom_prompt()
@@ -100,9 +112,9 @@ class LearnService:
         question = "what did Adi Iluz do in 2020?"
         prompt = ChatPromptTemplate.from_template(
             question)
-        chain = {"question": prompt
-                 } | prompt | llm | qa_result
-        response = chain.invoke()
+        chain = {"context": qa_result, "question": prompt
+                 } | prompt | llm
+        response = chain.invoke(question)
         return response
 
 
