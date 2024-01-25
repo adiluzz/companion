@@ -70,3 +70,9 @@ def get_document_file(id, ext):
 def get_document_by_id(id):
     document_from_db = InputDocument.objects(id=id)[0]
     return document_from_db.to_json()
+
+def update_document_name(document_id, new_name):
+    doc = InputDocument.objects(id=document_id)[0]
+    doc.name = new_name
+    doc.save()
+    return doc
