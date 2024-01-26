@@ -4,7 +4,7 @@ from langchain.utilities import GoogleSearchAPIWrapper
 from langchain.llms import LlamaCpp
 from langchain.tools import Tool, tool, ShellTool
 from langchain.agents import load_tools, initialize_agent
-from langchain_experimental.agents.agent_toolkits.csv.base import create_csv_agent
+#from langchain_experimental.agents.agent_toolkits.csv.base import create_csv_agent
 from langchain.agents.agent_types import AgentType
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.callbacks.manager import CallbackManager
@@ -56,7 +56,7 @@ def get_llm(chain_id):
 		# n_batch=n_batch,
 		n_ctx=n_ctx,
 		f16_kv=True,
-		temperature=0.75,
+		temperature=0.1,
 		max_tokens=tokens,
 		callback_manager=callback_manager,
 		verbose=True,
@@ -88,16 +88,16 @@ def get_tools(llm):
 	return tools
 
 def get_agent(tools, llm, export_to_csv):
-	if export_to_csv == True:
-		return create_csv_agent(
-			llm,
-			path='./temp/export.csv',
-			verbose=True,
-			# agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-		)
-	else:
-		return initialize_agent(
-			tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+	# if export_to_csv == True:
+	# 	return create_csv_agent(
+	# 		llm,
+	# 		path='./temp/export.csv',
+	# 		verbose=True,
+	# 		# agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+	# 	)
+	# else:
+	return initialize_agent(
+		tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
 
 def run_chain(questions, prompt, chain_id):
 	llm = get_llm(chain_id=chain_id)

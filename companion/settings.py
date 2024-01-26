@@ -33,7 +33,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 ALLOWED_HOSTS = [
     'https://api.consisto.io',
     'api.consisto.io',
-    '127.0.0.1'
+    '127.0.0.1',
+    'localhost'
  ]
 
 
@@ -57,7 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'companion.utils.auth.CognitAuthMiddleware'
+    #'companion.utils.auth.CognitAuthMiddleware'
 ]
 
 ROOT_URLCONF = 'companion.urls'

@@ -20,6 +20,7 @@ from django.urls import path, include
 from companion.modules.models.connect_to_db import connect_to_db
 from . import views
 from . import chains
+from companion.modules.learn import learn
 from . import chain
 from companion.modules.documents import documents
 from dotenv import load_dotenv
@@ -32,6 +33,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("chains/<path:chain_id>", chain.index, name="chains"),
     path("chains", chains.index, name="chains"),
+    path("learn", learn.index, name="learn"),
     path("documents/<str:document_id>/<str:file>", documents.index, name="documents"),
     path("documents/<str:document_id>", documents.index, name="documents"),
     path("documents", documents.index, name="documents"),
