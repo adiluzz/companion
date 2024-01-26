@@ -23,6 +23,10 @@ def save_document_to_s3(document_id, local_path, extension):
     remote_path = get_remote_file_address(id=document_id, ext=extension)
     s3.Bucket(bucket_name).upload_file(local_path, remote_path)
 
+def remove_document_from_s3(document_id, extension):
+    remote_path = get_remote_file_address(id=document_id, ext=extension)
+    s3.Object(bucket_name, remote_path).delete()
+    
 
 def save_file(file, id, type):
     directory = 'temp/documents'
@@ -33,22 +37,26 @@ def save_file(file, id, type):
         for chunk in file.chunks():
             destination.write(chunk)
         save_document_to_s3(document_id=id, local_path=path, extension=type)
+        os.remove(path)
 
 
 def save_document(request):
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
         name = form.data['name']
+        existing_document = get_document_by_name(name=name)
+        if existing_document:
+            raise Exception('A Ducoment with the same name already exists')
         type = form.data['type']
-        doc = InputDocument()
-        doc.name = name
-        doc.type = type
-        doc.save()
         try:
+            doc = InputDocument()
+            doc.name = name
+            doc.type = type
+            doc.save()
             save_file(
                 file=request.FILES['file'], id=doc.id, type=type)
         except Exception as e:
-            print(e)
+            raise e
 
 
 def get_documents():
@@ -71,8 +79,21 @@ def get_document_by_id(id):
     document_from_db = InputDocument.objects(id=id)[0]
     return document_from_db.to_json()
 
+def get_document_by_name(name):
+    document_from_db = InputDocument.objects(name=name)
+    if len(document_from_db) > 0:
+        return document_from_db[0].to_json()
+    else:
+        return None
+
 def update_document_name(document_id, new_name):
     doc = InputDocument.objects(id=document_id)[0]
     doc.name = new_name
     doc.save()
     return doc
+
+def delete_document(document_id):
+    doc = InputDocument.objects(id=document_id)[0]
+    remove_document_from_s3(document_id=document_id, extension=doc.type)
+    doc.delete()
+    
