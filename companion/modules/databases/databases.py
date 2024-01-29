@@ -1,17 +1,13 @@
 import json
 from django.http import HttpResponse
 
-from companion.modules.databases.databases_service import create_database, get_all_databases, get_database_by_id
+from companion.modules.databases.databases_service import create_database, delete_database, get_all_databases, get_database_by_id
 
 
 def index(request, database_id=None):
-    print('INSIDE')
     if request.method == 'GET':
-        print('GET')
         if database_id:
-            print(database_id)
             database = get_database_by_id(database_id=database_id)
-            print(database)
             if database:
                 return HttpResponse(database, content_type="application/json")
             else:
@@ -22,10 +18,13 @@ def index(request, database_id=None):
             
     if request.method == 'POST':
         body = json.loads(request.body)
-        print(body)
-        database = create_database(document_ids=body['document_ids'], name=body['name'])
-        print(database)
-        return HttpResponse(database, content_type="application/json")
+        try:
+            database = create_database(document_ids=body['document_ids'], name=body['name'])
+            return HttpResponse(database, content_type="application/json")
+        except Exception as e:
+            print(e)
+            return HttpResponse(content=e, status=400)
+            
         
 
     if request.method == 'PUT':
@@ -34,7 +33,9 @@ def index(request, database_id=None):
         
 
     if request.method == 'DELETE':
-        print('DELETE')
+        ids = json.loads(request.body)
+        for id in ids:
+            delete_database(id)
         return HttpResponse('Success')
         
 

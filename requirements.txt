@@ -22,4 +22,5 @@ sentence-transformers==2.2.2
 faiss-gpu==1.7.2
 pypdf==3.17.3
 ctransformers==0.2.27
-gevent==23.9.1 
+gevent==23.9.1
+watchdog==3.0.0
