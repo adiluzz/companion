@@ -9,10 +9,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 n_ctx = 4096
 bucket_name = 'companion-databases'
-chunk_size = 25
-chunk_overlap = 5
 
-def get_total_chunks(path):
+def get_splitted_text(path, chunk_size, chunk_overlap):
+    if chunk_size is None or 'None':
+        chunk_size = 200
+    if chunk_overlap is None or 'None':
+        chunk_overlap = 50
     loader = DirectoryLoader(path=path,
                              glob='*.pdf',
                              loader_cls=PyPDFLoader)
@@ -20,7 +22,7 @@ def get_total_chunks(path):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size,
                                                    chunk_overlap=chunk_overlap)
     texts = text_splitter.split_documents(documents)
-    return len(texts)
+    return texts
     
 def get_llama_embeddings():
     embedding = LlamaCppEmbeddings(
@@ -29,14 +31,8 @@ def get_llama_embeddings():
         n_ctx=n_ctx)
     return embedding
 
-def create_vector_db(source, dest):
-    loader = DirectoryLoader(path=source,
-                             glob='*.pdf',
-                             loader_cls=PyPDFLoader)
-    documents = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size,
-                                                   chunk_overlap=chunk_overlap)
-    texts = text_splitter.split_documents(documents)
+def create_vector_db(source, dest, chunk_size, chunk_overlap):
+    texts = get_splitted_text(path=source, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     llama_embeddings = get_llama_embeddings()
     db = FAISS.from_documents(texts, llama_embeddings)
     db.save_local(dest)
@@ -47,8 +43,10 @@ if __name__ == "__main__":
     args = sys.argv[1:]
     source = args[0]
     dest = args[1]
+    chunk_size = args[2]
+    chunk_overlap = args[3]
     try:
-        db = create_vector_db(source=source, dest=dest)
+        db = create_vector_db(source=source, dest=dest, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         print('::FINISHED PROCESS::')
         sys.exit(0)
     except SystemExit as sys_exit:

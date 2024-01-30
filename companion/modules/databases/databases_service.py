@@ -10,7 +10,7 @@ import boto3
 from companion.modules.databases.database_model import Database
 from companion.modules.databases.handlers.ErrorFileHandler import ErrorFileHandler
 from companion.modules.databases.handlers.LogFileHandler import LogFileHandler
-from companion.modules.databases.services.create_vector_db import get_total_chunks
+from companion.modules.databases.services.create_vector_db import get_splitted_text
 from companion.modules.databases.services.paths import get_temp_paths
 from companion.modules.databases.services.s3_service import remove_database_from_s3
 from companion.modules.documents.documents_service import get_document_by_id, get_document_file
@@ -36,14 +36,15 @@ def create_db_in_db(name, document_ids):
 
 def create_temp_directories(db_id):
     local_paths = get_temp_paths(db_id=db_id)
-    if not os.path.exists(local_paths['temp_directory']):
-        os.makedirs(local_paths['temp_directory'])
-    if not os.path.exists(local_paths['base']):
-        os.makedirs(local_paths['base'])
-    if not os.path.exists(local_paths['documents']):
-        os.makedirs(local_paths['documents'])
-    if not os.path.exists(local_paths['database']):
-        os.makedirs(local_paths['database'])
+    paths = [
+        local_paths['temp_directory'],
+        local_paths['base'],
+        local_paths['documents'],
+        local_paths['database']
+    ]
+    for path in paths:
+        if not os.path.exists(path):
+            os.makedirs(path)
 
 
 def get_document_in_database_temp(document_id, database_id):
@@ -51,7 +52,8 @@ def get_document_in_database_temp(document_id, database_id):
         document = json.loads(get_document_by_id(id=document_id))
         document_path = get_document_file(id=document_id, ext=document['type'])
         local_paths = get_temp_paths(database_id)
-        document_paths = get_documents_paths(document_id=document_id, type=document['type'])
+        document_paths = get_documents_paths(
+            document_id=document_id, type=document['type'])
         dest = f'{local_paths["documents"]}{document_id}.{document["type"]}'
         copyfile(document_path, dest)
         os.remove(path=document_path)
@@ -62,26 +64,25 @@ def get_document_in_database_temp(document_id, database_id):
         raise e
 
 
-def create_database_process(db):
+def create_database_process(db, chunk_size, chunk_overlap):
     local_paths = get_temp_paths(db.id)
-    with open(local_paths['log_file'], "w+") as log:
-        with open(local_paths['error_file'], "w+") as error:
-            curent_file_path = pathlib.Path(__file__).parent.resolve()
-            file_path = f'{curent_file_path}/services/create_vector_db.py'
-            subprocess.Popen(['python', file_path, local_paths['documents'],
-                              local_paths['database']], stdout=log, stderr=error)
-            observer = Observer()
-            observer.schedule(
-                event_handler=ErrorFileHandler(db=db),  path=local_paths['error_file'])
-            observer.schedule(event_handler=LogFileHandler(
-                db=db), path=local_paths['log_file'])
-            observer.start()
-            try:
-                while True:
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                observer.stop()
-            observer.join()
+    with open(local_paths['log_file'], "w+") as log, open(local_paths['error_file'], "w+") as error:
+        curent_file_path = pathlib.Path(__file__).parent.resolve()
+        file_path = f'{curent_file_path}/services/create_vector_db.py'
+        subprocess.Popen(['python', file_path, local_paths['documents'],
+                          local_paths['database'], str(chunk_size), str(chunk_overlap)], stdout=log, stderr=error)
+        observer = Observer()
+        observer.schedule(
+            event_handler=ErrorFileHandler(db=db),  path=local_paths['error_file'])
+        observer.schedule(event_handler=LogFileHandler(
+            db=db), path=local_paths['log_file'])
+        observer.start()
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
 
 
 def get_documents_to_temp_folder(document_ids, db_id):
@@ -93,15 +94,15 @@ def get_documents_to_temp_folder(document_ids, db_id):
     return documents_paths
 
 
-def create_database(document_ids, name):
+def create_database(document_ids, name, chunk_size, chunk_overlap):
     db = create_db_in_db(name=name, document_ids=document_ids)
     create_temp_directories(db.id)
     local_paths = get_temp_paths(db_id=db.id)
     get_documents_to_temp_folder(document_ids=document_ids, db_id=db.id)
-    total_chunks = get_total_chunks(local_paths['documents'])
+    total_chunks = len(get_splitted_text(local_paths['documents'], chunk_size, chunk_overlap))
     db.total_chunks = total_chunks
     db.save()
-    thread = Thread(target=create_database_process, args=(db,))
+    thread = Thread(target=create_database_process, args=(db, chunk_size, chunk_overlap,))
     thread.start()
     return
 

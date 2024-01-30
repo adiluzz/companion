@@ -1,6 +1,7 @@
+import traceback
 import json
 from django.http import HttpResponse
-from pydantic import ValidationError, PydanticUserError
+from pydantic import ValidationError
 
 from companion.modules.databases.databases_service import create_database, delete_database, get_all_databases, get_database_by_id
 from companion.modules.databases.validations.database_validations import DatabaseRequest
@@ -13,7 +14,7 @@ def index(request, database_id=None):
             if database:
                 return HttpResponse(database, content_type="application/json")
             else:
-                return HttpResponse(None, content_type="application/json")
+                return HttpResponse('Database not found', status=400)
         else:
             dbs = get_all_databases()
             return HttpResponse(dbs, content_type="application/json")
@@ -23,8 +24,10 @@ def index(request, database_id=None):
         try:
             name = body.get('name', '')
             document_ids = body.get('document_ids', [])
+            chunk_size = body.get('chunk_size', None)
+            chunk_overlap = body.get('chunk_overlap', None)
             DatabaseRequest(document_ids=document_ids, name=name)
-            database = create_database(document_ids=body['document_ids'], name=body['name'])
+            database = create_database(document_ids=body['document_ids'], name=body['name'], chunk_size=chunk_size, chunk_overlap=chunk_overlap)
             return HttpResponse(database, content_type="application/json")
         except ValidationError as ve:
             error = ve.errors()[0]
@@ -32,6 +35,7 @@ def index(request, database_id=None):
         except Exception as error:
             print('::GOT ERROR IN POST DATABASE::')
             print(error)
+            traceback.print_exc()
             return HttpResponse(content='Error while trying to create database' , status=400)
         
 

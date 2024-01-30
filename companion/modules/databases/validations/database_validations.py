@@ -1,7 +1,6 @@
-from pydantic import BaseModel, model_validator, ValidationError, validator
+from pydantic import BaseModel, model_validator, validator
 from typing import List, Optional
 from companion.modules.databases.database_model import Database
-
 from companion.modules.documents.document_model import InputDocument
 
 
@@ -24,7 +23,7 @@ class DatabaseRequest(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def name_exists_in_db(self, data):
+    def name_exists_in_db(self):
         name = self.name
         try:
             database_with_the_same_name = Database.objects(name=name)
@@ -36,7 +35,7 @@ class DatabaseRequest(BaseModel):
             raise ValueError('Database with this name exists')
     
     @model_validator(mode="after")
-    def documents_exist(self, data):
+    def documents_exist(self):
         document_ids = getattr(self, 'document_ids')
         try:
             for doc in document_ids:
