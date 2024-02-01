@@ -18,8 +18,6 @@ from companion.modules.documents.services.documents_paths import get_documents_p
 from shutil import copyfile
 from watchdog.observers import Observer
 
-
-n_ctx = 4096
 bucket_name = 'companion-databases'
 temp_directory = 'temp/databases'
 s3 = boto3.resource('s3', region_name='il-central-1')
@@ -64,13 +62,13 @@ def get_document_in_database_temp(document_id, database_id):
         raise e
 
 
-def create_database_process(db, chunk_size, chunk_overlap):
+def create_database_process(db, chunk_size, chunk_overlap, n_ctx):
     local_paths = get_temp_paths(db.id)
     with open(local_paths['log_file'], "w+") as log, open(local_paths['error_file'], "w+") as error:
         curent_file_path = pathlib.Path(__file__).parent.resolve()
         file_path = f'{curent_file_path}/services/create_vector_db.py'
         subprocess.Popen(['python', file_path, local_paths['documents'],
-                          local_paths['database'], str(chunk_size), str(chunk_overlap)], stdout=log, stderr=error)
+                          local_paths['database'], str(chunk_size), str(chunk_overlap), str(n_ctx)], stdout=log, stderr=error)
         observer = Observer()
         observer.schedule(
             event_handler=ErrorFileHandler(db=db),  path=local_paths['error_file'])
@@ -94,7 +92,7 @@ def get_documents_to_temp_folder(document_ids, db_id):
     return documents_paths
 
 
-def create_database(document_ids, name, chunk_size, chunk_overlap):
+def create_database(document_ids, name, chunk_size, chunk_overlap, n_ctx):
     db = create_db_in_db(name=name, document_ids=document_ids)
     create_temp_directories(db.id)
     local_paths = get_temp_paths(db_id=db.id)
@@ -102,7 +100,7 @@ def create_database(document_ids, name, chunk_size, chunk_overlap):
     total_chunks = len(get_splitted_text(local_paths['documents'], chunk_size, chunk_overlap))
     db.total_chunks = total_chunks
     db.save()
-    thread = Thread(target=create_database_process, args=(db, chunk_size, chunk_overlap,))
+    thread = Thread(target=create_database_process, args=(db, chunk_size, chunk_overlap, n_ctx,))
     thread.start()
     return
 

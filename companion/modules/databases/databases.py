@@ -26,8 +26,9 @@ def index(request, database_id=None):
             document_ids = body.get('document_ids', [])
             chunk_size = body.get('chunk_size', None)
             chunk_overlap = body.get('chunk_overlap', None)
+            n_ctx = body.get('n_ctx', None)
             DatabaseRequest(document_ids=document_ids, name=name)
-            database = create_database(document_ids=body['document_ids'], name=body['name'], chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+            database = create_database(document_ids=body['document_ids'], name=body['name'], chunk_size=chunk_size, chunk_overlap=chunk_overlap, n_ctx=n_ctx)
             return HttpResponse(database, content_type="application/json")
         except ValidationError as ve:
             error = ve.errors()[0]
