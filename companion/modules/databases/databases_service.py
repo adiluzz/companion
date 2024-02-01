@@ -7,6 +7,7 @@ import subprocess
 from threading import Thread
 import time
 import boto3
+from bson import ObjectId
 from companion.modules.databases.database_model import Database
 from companion.modules.databases.handlers.ErrorFileHandler import ErrorFileHandler
 from companion.modules.databases.handlers.LogFileHandler import LogFileHandler
@@ -26,7 +27,10 @@ bucket_name = 'companion-databases'
 
 def create_db_in_db(name, document_ids):
     db = Database()
-    db.documents = document_ids
+    documents_object_ids = []
+    for doc in document_ids:
+        documents_object_ids.append(ObjectId(doc))
+    db.documents = documents_object_ids
     db.name = name
     db.save()
     return db
@@ -97,16 +101,33 @@ def create_database(document_ids, name, chunk_size, chunk_overlap, n_ctx):
     create_temp_directories(db.id)
     local_paths = get_temp_paths(db_id=db.id)
     get_documents_to_temp_folder(document_ids=document_ids, db_id=db.id)
-    total_chunks = len(get_splitted_text(local_paths['documents'], chunk_size, chunk_overlap))
+    total_chunks = len(get_splitted_text(
+        local_paths['documents'], chunk_size, chunk_overlap))
     db.total_chunks = total_chunks
     db.save()
-    thread = Thread(target=create_database_process, args=(db, chunk_size, chunk_overlap, n_ctx,))
+    thread = Thread(target=create_database_process, args=(
+        db, chunk_size, chunk_overlap, n_ctx,))
     thread.start()
     return
 
 
-def get_database_by_id(id):
-    db = Database.objects(id=id)
+def get_database_by_id(database_id):
+    pipeline = [
+        {
+            '$match': {
+                '_id': ObjectId(database_id)
+            }
+        }, {
+            '$lookup': {
+                'from': 'input_document',
+                'localField': 'documents',
+                'foreignField': '_id',
+                'as': 'documents'
+            }
+        }
+
+    ]
+    db = list(Database.objects().aggregate(pipeline))
     if db[0]:
         return db[0]
     else:

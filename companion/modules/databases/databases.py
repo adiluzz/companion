@@ -9,15 +9,23 @@ from companion.modules.databases.validations.database_validations import Databas
 
 def index(request, database_id=None):
     if request.method == 'GET':
-        if database_id:
-            database = get_database_by_id(database_id=database_id)
-            if database:
-                return HttpResponse(database, content_type="application/json")
+        try:
+            if database_id:
+                database = get_database_by_id(database_id=database_id)
+                if database is not None:
+                    resposne_data = {}
+                    resposne_data['database'] = database
+                    return HttpResponse(json.dumps(resposne_data, default=str), content_type="application/json")
+                else:
+                    return HttpResponse('Database not found', status=400)
             else:
-                return HttpResponse('Database not found', status=400)
-        else:
-            dbs = get_all_databases()
-            return HttpResponse(dbs, content_type="application/json")
+                dbs = get_all_databases()
+                return HttpResponse(dbs, content_type="application/json")
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return HttpResponse('Unexpected error', status=400)
+
             
     if request.method == 'POST':
         body = json.loads(request.body)
