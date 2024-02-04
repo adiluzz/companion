@@ -8,7 +8,6 @@ from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 default_n_ctx = 4096
-bucket_name = 'companion-databases'
 
 def get_splitted_text(path, chunk_size, chunk_overlap):
     if chunk_size is None or 'None':

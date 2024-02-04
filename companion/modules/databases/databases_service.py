@@ -1,5 +1,3 @@
-
-
 import json
 import os
 import pathlib
@@ -19,10 +17,6 @@ from companion.modules.documents.services.documents_paths import get_documents_p
 from shutil import copyfile
 from watchdog.observers import Observer
 
-bucket_name = 'companion-databases'
-temp_directory = 'temp/databases'
-s3 = boto3.resource('s3', region_name='il-central-1')
-bucket_name = 'companion-databases'
 
 
 def create_db_in_db(name, document_ids):
