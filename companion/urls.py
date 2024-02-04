@@ -23,6 +23,7 @@ from . import chains
 from companion.modules.learn import learn
 from . import chain
 from companion.modules.documents import documents
+from companion.modules.databases import databases
 from dotenv import load_dotenv
 
 
@@ -37,5 +38,7 @@ urlpatterns = [
     path("documents/<str:document_id>/<str:file>", documents.index, name="documents"),
     path("documents/<str:document_id>", documents.index, name="documents"),
     path("documents", documents.index, name="documents"),
+    path("databases/<str:database_id>", databases.index, name="databases"),
+    path("databases", databases.index, name="databases"),
     path('admin/', admin.site.urls),
 ]

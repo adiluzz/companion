@@ -3,6 +3,7 @@ import boto3
 from django import forms
 
 from companion.modules.documents.document_model import InputDocument
+from companion.modules.documents.services.documents_paths import get_local_directory_by_id, get_local_path_by_id
 
 s3 = boto3.resource('s3', region_name='il-central-1')
 bucket_name = 'companion-documents'
@@ -26,13 +27,13 @@ def save_document_to_s3(document_id, local_path, extension):
 def remove_document_from_s3(document_id, extension):
     remote_path = get_remote_file_address(id=document_id, ext=extension)
     s3.Object(bucket_name, remote_path).delete()
-    
+
 
 def save_file(file, id, type):
-    directory = 'temp/documents'
-    path = f"{directory}/{id}.{type}"
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    base_path = get_local_directory_by_id(id=id)
+    path = get_local_path_by_id(id=id, type=type)
+    if not os.path.exists(base_path):
+        os.makedirs(base_path)
     with open(path, "wb+") as destination:
         for chunk in file.chunks():
             destination.write(chunk)
@@ -46,7 +47,7 @@ def save_document(request):
         name = form.data['name']
         existing_document = get_document_by_name(name=name)
         if existing_document:
-            raise Exception('A Ducoment with the same name already exists')
+            raise Exception('A Document with the same name already exists')
         type = form.data['type']
         try:
             doc = InputDocument()
@@ -67,17 +68,24 @@ def get_documents():
 def get_document_file(id, ext):
     try:
         remote_address = get_remote_file_address(id=id, ext=ext)
-        local_address = f'temp/{id}.{ext}'
+        local_dir = get_local_directory_by_id(id=id)
+        local_address = get_local_path_by_id(id=id, type=ext)
+        if not os.path.exists(local_dir):
+            os.makedirs(local_dir)
         obj = s3.Object(bucket_name, remote_address)
         obj.download_file(Filename=local_address)
         return local_address
     except Exception as e:
         print(e)
+        raise e
 
 
 def get_document_by_id(id):
-    document_from_db = InputDocument.objects(id=id)[0]
-    return document_from_db.to_json()
+    document_from_db = InputDocument.objects(id=id).first()
+    if document_from_db is not None:
+        return document_from_db.to_json()
+    return document_from_db
+
 
 def get_document_by_name(name):
     document_from_db = InputDocument.objects(name=name)

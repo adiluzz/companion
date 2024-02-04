@@ -225,6 +225,6 @@ class CognitAuthMiddleware(object):
         return self.get_response(request)
 
     def process_exception(self, request, exception):
-        return HttpResponse(content=exception, status=401)
+        return HttpResponse(content=exception, status=500)
 
 
