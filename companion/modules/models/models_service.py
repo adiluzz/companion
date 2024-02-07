@@ -169,21 +169,13 @@ def qa_bot(llm, qa_prompt, db_id):
 def run_qa_chain(db_id, question, chain_id):
     try:
         print(chain_id)
-        print('1')
         qa_prompt = custom_prompt()
-        print('2')
         llm = get_llm(chain_id=chain_id)
-        print('3')
         qa_result = qa_bot(llm=llm, qa_prompt=qa_prompt, db_id=db_id)
-        print('4')
-        print(question['question'])
         prompt = ChatPromptTemplate.from_template(
             question['question'])
-        print('5')
         chain = qa_result | prompt | llm
-        print('6')
         response = chain.invoke(question['question'])
-        print('7')
         return response
     except Exception as e:
         print(e)
