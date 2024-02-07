@@ -10,7 +10,7 @@ from companion.modules.databases.database_model import Database
 from companion.modules.databases.handlers.ErrorFileHandler import ErrorFileHandler
 from companion.modules.databases.handlers.LogFileHandler import LogFileHandler
 from companion.modules.databases.services.create_vector_db import get_splitted_text
-from companion.modules.databases.services.paths import get_temp_paths
+from companion.modules.databases.services.paths import create_temp_directories, get_temp_paths
 from companion.modules.databases.services.s3_service import remove_database_from_s3
 from companion.modules.documents.documents_service import get_document_by_id, get_document_file
 from companion.modules.documents.services.documents_paths import get_documents_paths
@@ -28,20 +28,6 @@ def create_db_in_db(name, document_ids):
     db.name = name
     db.save()
     return db
-
-
-def create_temp_directories(db_id):
-    local_paths = get_temp_paths(db_id=db_id)
-    paths = [
-        local_paths['temp_directory'],
-        local_paths['base'],
-        local_paths['documents'],
-        local_paths['database']
-    ]
-    for path in paths:
-        if not os.path.exists(path):
-            os.makedirs(path)
-
 
 def get_document_in_database_temp(document_id, database_id):
     try:
