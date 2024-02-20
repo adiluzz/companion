@@ -1,3 +1,6 @@
+import os
+
+
 temp_directory = 'temp/databases'
 
 def get_temp_paths(db_id):
@@ -14,3 +17,14 @@ def get_temp_paths(db_id):
     paths['error_file'] = f'{paths["database"]}error.txt'
     return paths
 
+def create_temp_directories(db_id):
+    local_paths = get_temp_paths(db_id=db_id)
+    paths = [
+        local_paths['temp_directory'],
+        local_paths['base'],
+        local_paths['documents'],
+        local_paths['database']
+    ]
+    for path in paths:
+        if not os.path.exists(path):
+            os.makedirs(path)

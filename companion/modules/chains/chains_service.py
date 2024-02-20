@@ -6,7 +6,7 @@ from companion.modules.chains.chains_model import Chain
 
 class ChainsService:
 
-	def run_chain(chain_data, title):
+	def run_chain(chain_data, title, db_id):
 		template = """
   			Question: {question}. 
 			If you don't know, search the internet or ask a human
@@ -15,8 +15,9 @@ class ChainsService:
 			template=template, input_variables=["question"])
 		created_chain = Chain()
 		created_chain.title = title
+		created_chain.input = chain_data
 		created_chain.save()
-		thread = Thread(target=run_chain_service, args=(chain_data, prompt, created_chain.id))
+		thread = Thread(target=run_chain_service, args=(chain_data, prompt, created_chain.id, db_id))
 		thread.start()
 		return str(created_chain.id)
 
