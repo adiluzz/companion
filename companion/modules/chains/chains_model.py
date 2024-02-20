@@ -11,4 +11,5 @@ class Chain(DynamicDocument):
     finished = DateTimeField()
     error = ChainError()
     chain = StringField()
+    input = [StringField()]
     meta = {'allow_inheritance': True}

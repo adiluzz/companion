@@ -15,6 +15,7 @@ class ChainsService:
 			template=template, input_variables=["question"])
 		created_chain = Chain()
 		created_chain.title = title
+		created_chain.input = chain_data
 		created_chain.save()
 		thread = Thread(target=run_chain_service, args=(chain_data, prompt, created_chain.id, db_id))
 		thread.start()

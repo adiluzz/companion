@@ -46,7 +46,7 @@ class MyCustomHandler(BaseCallbackHandler):
             error={"error_time": datetime.now(), "error_text": error})
 
 
-n_gpu_layers = 1
+n_gpu_layers = 4
 n_batch = 4096
 n_ctx = 4096
 tokens = 10000000
@@ -64,8 +64,8 @@ def get_llm(chain_id):
     path = os.environ['MODEL_PATH']
     llm = LlamaCpp(
         model_path=path,
-        # n_gpu_layers=n_gpu_layers,
-        # n_batch=n_batch,
+        n_gpu_layers=n_gpu_layers,
+        n_batch=n_batch,
         n_ctx=n_ctx,
         f16_kv=True,
         temperature=0.80,
@@ -175,6 +175,10 @@ def run_qa_chain(db_id, question, chain_id):
         prompt = ChatPromptTemplate.from_template(
             question['question'])
         chain = qa_result | prompt | llm
+        
+        # chain = {"context": qa_result, "question": prompt
+        #          } | prompt | llm
+        # response = chain.invoke(question)
         response = chain.invoke(question['question'])
         return response
     except Exception as e:
